@@ -11,7 +11,7 @@
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowfullscreen
       ></iframe>
-      <p class="mt-4 text-white">Number of views: {{ viewCount }}</p>
+      <p class="mt-4 text-white text-center">Number of views: {{ viewCount }}</p>
 
       <!-- Project Information Section -->
       <div class="mt-8">
@@ -20,8 +20,10 @@
           This project is built using Feathers.js, Nuxt.js, and MongoDB.
         </p>
         <div class="mt-4">
-          <h3 class="text-lg font-semibold text-purple-300 text-white">GitHub Repository:</h3>
-          <a href="https://github.com/your-username/your-repo" class="text-blue-500 hover:underline">https://github.com/your-username/your-repo</a>
+          <h3 class="text-lg font-semibold text-purple-300 text-white">Frontend GitHub Repository:</h3>
+          <a href="https://github.com/PDominguezW/recruitmentTaskLedgeFrontend" class="text-purple-500 hover:underline">https://github.com/PDominguezW/recruitmentTaskLedgeFrontend</a>
+          <h3 class="text-lg font-semibold text-purple-300 text-white">Backend GitHub Repository:</h3>
+          <a href="https://github.com/PDominguezW/recruitmentTaskLedgeBackend" class="text-purple-500 hover:underline">https://github.com/PDominguezW/recruitmentTaskLedgeBackend</a>
         </div>
         <div class="mt-2">
           <h3 class="text-lg font-semibold text-purple-300 text-white">Feathers.js:</h3>
