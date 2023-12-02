@@ -21,7 +21,7 @@
       <div class="mt-8">
         <h2 class="text-2xl font-semibold text-purple-400 text-white text-center">Project Information</h2>
         <p class="mt-2 text-gray-400 text-white text-center">
-          This project is built using Feathers.js for the backend, Nuxt.js for the frontend, and MongoDB for the DB. Both frontend and backend are hosted in AWS Amplify. 
+          This project is built using Feathers.js for the backend, Nuxt.js for the frontend, and MongoDB for the DB. The frontend is hosted in AWS Amplify, while the backend is hosted in a AWS EC2 instance. 
         </p>
         <div class="mt-10 flex flex-col items-center">
           <div>
@@ -51,7 +51,7 @@ export default {
   },
   methods: {
     fetchViewCount() {
-      axios.get('http://localhost:3030/contadorVis')
+      axios.get('http://3.17.60.129:8000/contadorVis')
         .then(response => {
           console.log(response.data);
           this.viewCount = response.data;
