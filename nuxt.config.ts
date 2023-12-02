@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   ],
   app: {
     head: {
-        link: [{ rel: 'icon', type: 'image/png', href: "/assets/images/obama.png" }],
+        link: [{ rel: 'icon', type: 'image/png', href: "https://upload.wikimedia.org/wikipedia/commons/b/b8/Barack_Obama_ic%C3%B4ne.png" }],
         title: 'Obama Movie',
     },
 },
