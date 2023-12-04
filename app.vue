@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-cover bg-center" style="background-image: url('https://free4kwallpapers.com/uploads/originals/2016/02/04/barack-obama-in-black--white-wallpaper.jpg');">
+  <div class="min-h-screen flex items-center justify-center bg-cover bg-center" :style="{ backgroundImage: `url('${this.variables.BACKGROUND_IMAGE_URL}')` }">
     <div id="main_div" class="m-10 max-w-3xl bg-black bg-opacity-80 p-8 rounded-md shadow-md hover:bg-opacity-100 transition-all duration-300">
       <div class="flex flex-col items-center">
         <video
@@ -29,18 +29,17 @@
       </div>
 
       <!-- Project Information Section -->
-      <!-- Project Information Section -->
       <div class="mt-8">
         <h2 class="text-2xl font-semibold text-purple-400 text-white text-center">Project Information</h2>
         <p class="mt-2 text-gray-400 text-white text-center">
-          This project is built using Feathers.js for the backend, Nuxt.js for the frontend, and MongoDB for the DB. The frontend is hosted in AWS Amplify, while the backend is hosted in a AWS EC2 instance. 
+          This project is built using Feathers.js for the backend, Nuxt.js for the frontend, and MongoDB for the DB. The frontend is hosted in AWS Amplify, while the backend is hosted in Render. 
         </p>
         <div class="mt-10 flex flex-col items-center">
           <div>
-            <a class="text-lg font-semibold text-white hover:text-gray-500" href="https://github.com/PDominguezW/recruitmentTaskLedgeFrontend">Frontend GitHub Repository</a>
+            <a class="text-lg font-semibold text-white hover:text-gray-500" :href="`${this.variables.GITHUB_FRONTEND_URL}`">Frontend GitHub Repository</a>
           </div>
           <div>
-            <a class="text-lg font-semibold text-white hover:text-gray-500" href="https://github.com/PDominguezW/recruitmentTaskLedgeBackend">Backend GitHub Repository</a>
+            <a class="text-lg font-semibold text-white hover:text-gray-500" :href="`${this.variables.GITHUB_BACKEND_URL}`">Backend GitHub Repository</a>
           </div>
         </div>
       </div>
@@ -59,20 +58,29 @@ export default {
       isPostTriggered: false,
       videoElement: null,
       videoDuration: null,
+      variables: useRuntimeConfig().public
     };
   },
   beforeMount() {
     this.fetchViewCount();
   },
   mounted() {
+    // Get runtime config
     this.videoElement = this.$refs.videoElement;
 
     // Save video duration as seconds int
-    this.videoDuration = Math.floor(this.videoElement.duration);
+    this.videoElement.addEventListener('loadedmetadata', this.handleVideoMetadataLoaded);
   },
   methods: {
+    handleVideoMetadataLoaded() {
+      // Save video duration as seconds int
+      this.videoDuration = Math.floor(this.videoElement.duration);
+
+      // Remove the event listener to avoid multiple calls
+      this.videoElement.removeEventListener('loadedmetadata', this.handleVideoMetadataLoaded);
+    },
     fetchViewCount() {
-      axios.get('http://localhost:8000/contadorVis')
+      axios.get(`${this.variables.BACKEND_URL}/contadorVis`)
         .then(response => {
           console.log(response.data);
           this.viewCount = response.data;
@@ -83,7 +91,7 @@ export default {
     },
     increaseViewCount() {
       console.log('Increasing view count...');
-      axios.post('http://localhost:8000/contadorVis')
+      axios.post(`${this.variables.BACKEND_URL}/contadorVis`)
         .then(response => {
           this.viewCount = response.data;
         })
