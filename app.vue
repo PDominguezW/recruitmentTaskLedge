@@ -1,22 +1,34 @@
-<style src="@/assets/css/tailwind.css"></style>
 <template>
   <div class="min-h-screen flex items-center justify-center bg-cover bg-center" style="background-image: url('https://free4kwallpapers.com/uploads/originals/2016/02/04/barack-obama-in-black--white-wallpaper.jpg');">
     <div id="main_div" class="m-10 max-w-3xl bg-black bg-opacity-80 p-8 rounded-md shadow-md hover:bg-opacity-100 transition-all duration-300">
       <div class="flex flex-col items-center">
-        <iframe
+        <video
+          ref="videoElement"
           class="rounded-md"
           width="560"
           height="315"
-          src="https://www.youtube.com/embed/sMQXdOjcsP8?si=Lgu_uqiOVx24QnX0"
-          title="YouTube video player"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowfullscreen
-        ></iframe>
+          controls
+          @timeupdate="handleVideoTimeUpdate"
+        >
+          <source src="@/assets/videos/obama.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
         <p class="mt-4 text-white text-center">Number of views:</p>
-        <p class="text-white text-center">{{ viewCount }}</p>
+        <!-- If viewcount is null, show loading spinner -->
+        <div v-if="viewCount === null" class="mt-2 flex justify-center">
+          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+        </div>
+        <!-- If viewcount is not null, show viewcount -->
+        <div v-else class="mt-2 text-white text-center">
+          {{ viewCount }}
+        </div>
+
       </div>
 
+      <!-- Project Information Section -->
       <!-- Project Information Section -->
       <div class="mt-8">
         <h2 class="text-2xl font-semibold text-purple-400 text-white text-center">Project Information</h2>
@@ -42,39 +54,60 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      viewCount: "Loading...",
-      loadingAnimationState: 0, // 0 represents '...', 1 represents '..', 2 represents '.'
+      viewCount: null,
+      viewedSeconds: new Set(),
+      isPostTriggered: false,
+      videoElement: null,
+      videoDuration: null,
     };
   },
   beforeMount() {
     this.fetchViewCount();
   },
+  mounted() {
+    this.videoElement = this.$refs.videoElement;
+
+    // Save video duration as seconds int
+    this.videoDuration = Math.floor(this.videoElement.duration);
+  },
   methods: {
     fetchViewCount() {
-      axios.get('http://3.17.60.129:8000/contadorVis')
+      axios.get('http://localhost:8000/contadorVis')
         .then(response => {
           console.log(response.data);
           this.viewCount = response.data;
         })
         .catch(error => {
           console.error('Error fetching view count:', error);
-
-          // Update loading animation in a cycle
-          setInterval(() => {
-            this.loadingAnimationState = (this.loadingAnimationState + 1) % 3;
-            switch (this.loadingAnimationState) {
-              case 0:
-                this.viewCount = "Loading.";
-                break;
-              case 1:
-                this.viewCount = "Loading..";
-                break;
-              case 2:
-                this.viewCount = "Loading...";
-                break;
-            }
-          }, 500);
         });
+    },
+    increaseViewCount() {
+      console.log('Increasing view count...');
+      axios.post('http://localhost:8000/contadorVis')
+        .then(response => {
+          this.viewCount = response.data;
+        })
+        .catch(error => {
+          console.error('Error increasing view count:', error);
+        });
+    },
+    handleVideoTimeUpdate() {
+      if (this.isPostTriggered) {
+        return; // Post already triggered, no need to check again
+      }
+      const currentTime = this.videoElement.currentTime;
+
+      // Truncate to seconds
+      const currentTimeSeconds = Math.floor(currentTime);
+
+      // Add the current time to the viewed seconds
+      this.viewedSeconds.add(currentTimeSeconds);
+
+      // Check if the video has reached 60%
+      if (this.viewedSeconds.size >= this.videoDuration * 0.6) {
+        this.increaseViewCount(); // Make your POST request here
+        this.isPostTriggered = true; // Set flag to prevent multiple POSTs
+      }
     },
   },
 };
